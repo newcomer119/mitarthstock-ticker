@@ -8,7 +8,7 @@ const pricingSchema = z.object({
   strike: z.number().positive(),
   expiration: z.string().min(1),
   quantity: z.number().int().positive().optional(),
-  models: z.array(z.enum(['blackScholes', 'binomial', 'monteCarlo'])).min(1),
+  models: z.array(z.enum(['blackScholes', 'binomial', 'monteCarlo', 'pde'])).min(1),
   binomialSteps: z.number().int().positive().max(2000).optional(),
   monteCarloPaths: z.number().int().positive().max(500_000).optional(),
   monteCarloSeed: z.number().int().optional(),

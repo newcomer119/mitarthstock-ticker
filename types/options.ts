@@ -1,6 +1,6 @@
 export type OptionType = 'call' | 'put';
 
-export type OptionPricingModel = 'blackScholes' | 'binomial' | 'monteCarlo';
+export type OptionPricingModel = 'blackScholes' | 'binomial' | 'monteCarlo' | 'pde';
 
 export type OptionPricingModelConfig = {
   models: OptionPricingModel[];

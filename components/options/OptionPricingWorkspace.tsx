@@ -44,7 +44,7 @@ const DEFAULT_FORM_STATE: FormState = {
   strike: "",
   expiration: "",
   quantity: "1",
-  models: ["blackScholes", "binomial", "monteCarlo"],
+  models: ["blackScholes", "binomial", "monteCarlo", "pde"],
   binomialSteps: "200",
   monteCarloPaths: "25000",
   monteCarloSeed: "",
@@ -57,6 +57,7 @@ const MODEL_LABELS: Record<OptionPricingModel, string> = {
   blackScholes: "Black-Scholes",
   binomial: "Binomial Tree",
   monteCarlo: "Monte Carlo",
+  pde: "PDE (Crank-Nicolson)",
 };
 
 const formatPercent = (value: number) =>
@@ -64,6 +65,21 @@ const formatPercent = (value: number) =>
 
 const formatNumber = (value: number, fractionDigits = 2) =>
   Number.isFinite(value) ? value.toFixed(fractionDigits) : "—";
+
+const formatParameterValue = (key: string, value: number | string) => {
+  if (typeof value !== "number") return String(value);
+  const lowerKey = key.toLowerCase();
+  const digits =
+    lowerKey.includes("residual") || lowerKey.includes("boundary") ? 4 : 2;
+  return formatNumber(value, digits);
+};
+
+const humanizeKey = (key: string) =>
+  key
+    .replace(/_/g, " ")
+    .replace(/([A-Z])/g, " $1")
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .trim();
 
 export function OptionPricingWorkspace() {
   const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
@@ -228,8 +244,8 @@ export function OptionPricingWorkspace() {
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold">Options Pricing Lab</h1>
         <p className="text-muted-foreground">
-          Compare Black-Scholes, Binomial, and Monte Carlo valuations with live
-          Finnhub market data.
+          Compare Black-Scholes, Binomial, Monte Carlo, and PDE valuations with
+          live Finnhub market data.
         </p>
       </header>
 
@@ -595,6 +611,18 @@ const ResultCard = ({ result }: ResultCardProps) => {
               )}`}
             />
           </div>
+        </div>
+      )}
+
+      {result.model === "pde" && metadata.parameters && (
+        <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+          {Object.entries(metadata.parameters).map(([key, value]) => (
+            <SummaryField
+              key={key}
+              label={humanizeKey(key)}
+              value={formatParameterValue(key, value)}
+            />
+          ))}
         </div>
       )}
 
